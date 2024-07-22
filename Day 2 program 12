@@ -1,0 +1,27 @@
+# Load necessary libraries
+library(ggplot2)
+library(hexbin)
+
+# Create a data frame
+engagement_data <- data.frame(
+  Date = as.Date(c("2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06", "2023-01-07")),
+  Likes = c(150, 200, 250, 300, 350, 400, 450),
+  Comments = c(20, 25, 30, 35, 40, 45, 50),
+  Shares = c(30, 35, 40, 45, 50, 55, 60)
+)
+
+# Combine Likes, Comments, and Shares into a single measure of engagement
+engagement_data$Engagement <- engagement_data$Likes + engagement_data$Comments + engagement_data$Shares
+
+# Create the hexbin plot
+ggplot(engagement_data, aes(x = Date, y = Engagement)) +
+  geom_hex() +
+  scale_fill_gradient(low = "blue", high = "red") +
+  labs(title = "Daily Social Media Engagement",
+       x = "Date",
+       y = "Engagement",
+       fill = "Count") +
+  theme_minimal()
+
+# Save the plot
+ggsave("hexbin_plot.png")
