@@ -1,0 +1,19 @@
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Data
+data <- data.frame(
+  Month = rep(c('Jan', 'Feb', 'Mar'), each = 3),
+  Employee = rep(c('A', 'B', 'C'), times = 3),
+  Score = c(85, 90, 78, 88, 92, 80, 90, 94, 82)
+)
+
+# Plot
+ggplot(data, aes(x = Score, fill = Employee)) +
+  geom_histogram(position = "identity", alpha = 0.5, binwidth = 2) +
+  labs(title = "Monthly Performance Scores of Employees",
+       x = "Score",
+       y = "Frequency") +
+  theme_minimal() +
+  scale_fill_manual(values = c("blue", "red", "green"))
