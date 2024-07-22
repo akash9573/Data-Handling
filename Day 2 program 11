@@ -1,0 +1,24 @@
+# Load necessary libraries
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+# Create the data frame
+data <- data.frame(
+  Week = as.Date(c('2023-01-01', '2023-01-08', '2023-01-15',
+                   '2023-01-01', '2023-01-08', '2023-01-15',
+                   '2023-01-01', '2023-01-08', '2023-01-15')),
+  City = c('New York', 'New York', 'New York', 
+           'Los Angeles', 'Los Angeles', 'Los Angeles', 
+           'Chicago', 'Chicago', 'Chicago'),
+  AverageTemperature = c(-2, 0, 2, 15, 17, 18, -5, -3, -2)
+)
+
+# Create the line plot
+ggplot(data, aes(x = Week, y = AverageTemperature, color = City)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
+  labs(title = 'Weekly Average Temperatures of New York, Los Angeles, and Chicago',
+       x = 'Week', y = 'Average Temperature (°C)') +
+  theme_minimal() +
+  theme(legend.title = element_blank())
