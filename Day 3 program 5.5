@@ -1,0 +1,51 @@
+# Install and load the necessary package
+install.packages("plotly")
+library(plotly)
+
+# Create a data frame with the given data
+data <- data.frame(
+  Student = c("A", "B", "C", "D", "E"),
+  Math_Score = c(85, 72, 90, 78, 88),
+  Science_Score = c(78, 85, 80, 75, 82),
+  Attendance = c(95, 92, 98, 85, 93)
+)
+
+# Create a grid of Math Scores and Attendance values
+math_range <- seq(min(data$Math_Score), max(data$Math_Score), length.out = 100)
+attendance_range <- seq(min(data$Attendance), max(data$Attendance), length.out = 100)
+grid <- expand.grid(Math_Score = math_range, Attendance = attendance_range)
+
+# Predict Science Scores based on the grid values using linear model
+model <- lm(Science_Score ~ Math_Score + Attendance, data = data)
+grid$Science_Score <- predict(model, newdata = grid)
+
+# 1. 3D Surface Plot: Science Scores vs. Math Scores and Attendance
+plot_ly(grid, x = ~Math_Score, y = ~Attendance, z = ~Science_Score, type = 'surface') %>%
+  layout(scene = list(xaxis = list(title = 'Math Score'),
+                      yaxis = list(title = 'Attendance (%)'),
+                      zaxis = list(title = 'Science Score')),
+         title = '3D Surface Plot of Science Scores vs. Math Scores and Attendance')
+
+# 2. 3D Surface Plot: Science Scores vs. Math Scores (with Attendance held constant)
+# Let's hold Attendance constant at the median value
+constant_attendance <- median(data$Attendance)
+grid_constant_attendance <- expand.grid(Math_Score = math_range, Attendance = constant_attendance)
+grid_constant_attendance$Science_Score <- predict(model, newdata = grid_constant_attendance)
+
+plot_ly(grid_constant_attendance, x = ~Math_Score, y = ~constant_attendance, z = ~Science_Score, type = 'surface') %>%
+  layout(scene = list(xaxis = list(title = 'Math Score'),
+                      yaxis = list(title = 'Constant Attendance'),
+                      zaxis = list(title = 'Science Score')),
+         title = '3D Surface Plot of Science Scores vs. Math Scores (Attendance Constant)')
+
+# 3. 3D Surface Plot: Science Scores vs. Attendance (with Math Scores held constant)
+# Let's hold Math Scores constant at the median value
+constant_math <- median(data$Math_Score)
+grid_constant_math <- expand.grid(Math_Score = constant_math, Attendance = attendance_range)
+grid_constant_math$Science_Score <- predict(model, newdata = grid_constant_math)
+
+plot_ly(grid_constant_math, x = ~constant_math, y = ~Attendance, z = ~Science_Score, type = 'surface') %>%
+  layout(scene = list(xaxis = list(title = 'Constant Math Score'),
+                      yaxis = list(title = 'Attendance (%)'),
+                      zaxis = list(title = 'Science Score')),
+         title = '3D Surface Plot of Science Scores vs. Attendance (Math Score Constant)')
