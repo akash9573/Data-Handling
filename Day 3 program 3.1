@@ -1,0 +1,35 @@
+# Load required libraries
+library(ggplot2)
+
+# Create the data frame
+data <- data.frame(
+  Product = c("A", "B", "C", "D", "E"),
+  Price = c(50, 70, 60, 45, 55),
+  Rating = c(4.2, 3.8, 4.0, 4.5, 3.9),
+  AgeGroup = c("25-35", "35-45", "18-25", "45-55", "25-35")
+)
+
+# Convert AgeGroup to a factor
+data$AgeGroup <- as.factor(data$AgeGroup)
+
+# Scatter plot of Rating vs Price colored by AgeGroup
+ggplot(data, aes(x = Price, y = Rating, color = AgeGroup)) +
+  geom_point(size = 3) +
+  labs(title = "Rating vs Price by Age Group",
+       x = "Price ($)",
+       y = "Rating") +
+  theme_minimal()
+
+# Boxplot of Rating by AgeGroup
+ggplot(data, aes(x = AgeGroup, y = Rating, fill = AgeGroup)) +
+  geom_boxplot() +
+  labs(title = "Rating Distribution by Age Group",
+       x = "Age Group",
+       y = "Rating") +
+  theme_minimal()
+
+# Fit the linear model
+model <- lm(Rating ~ Price + AgeGroup, data = data)
+
+# Summary of the model
+summary(model)
