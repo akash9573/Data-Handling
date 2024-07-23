@@ -1,0 +1,30 @@
+# Install and load necessary libraries
+if (!require(plotly)) install.packages("plotly")
+library(plotly)
+
+# Create a grid of stock prices and volumes
+stock_prices <- seq(90, 120, by = 1)
+volumes <- seq(2, 4, by = 0.1)
+
+# Create a mesh grid
+grid <- expand.grid(StockPrice = stock_prices, VolumeTraded = volumes)
+
+# Generate market cap values based on some function of stock price and volume traded
+# For demonstration, we use a simple linear combination with some noise
+set.seed(123)
+grid$MarketCap <- 4 * grid$StockPrice + 10 * grid$VolumeTraded + rnorm(nrow(grid), sd = 20)
+
+# Reshape data for surface plot
+library(reshape2)
+grid_matrix <- dcast(grid, VolumeTraded ~ StockPrice, value.var = "MarketCap")
+
+# Create the 3D surface plot
+plot_ly(z = as.matrix(grid_matrix[, -1]), 
+        x = ~as.numeric(colnames(grid_matrix)[-1]), 
+        y = ~grid_matrix$VolumeTraded, 
+        type = 'surface') %>%
+  layout(title = "3D Surface Plot of Market Capitalization",
+         scene = list(xaxis = list(title = 'Stock Price ($)'),
+                      yaxis = list(title = 'Volume Traded (millions)'),
+                      zaxis = list(title = 'Market Cap ($)')))
+D
