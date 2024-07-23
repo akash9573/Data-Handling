@@ -1,0 +1,50 @@
+# Install and load required libraries
+install.packages("plotly")
+library(plotly)
+
+# Create the data frame
+data <- data.frame(
+  Product = c("A", "B", "C", "D", "E"),
+  Price = c(50, 70, 60, 45, 55),
+  Rating = c(4.2, 3.8, 4.0, 4.5, 3.9),
+  AgeGroup = c("25-35", "35-45", "18-25", "45-55", "25-35")
+)
+
+# Convert AgeGroup to a factor and then to numeric
+data$AgeGroup <- as.factor(data$AgeGroup)
+data$AgeGroupNum <- as.numeric(data$AgeGroup)
+
+# Create a grid for Price and AgeGroup
+price_seq <- seq(min(data$Price), max(data$Price), length.out = 100)
+agegroup_seq <- seq(min(data$AgeGroupNum), max(data$AgeGroupNum), length.out = 100)
+
+# Create a grid of Price and AgeGroup values
+grid <- expand.grid(Price = price_seq, AgeGroupNum = agegroup_seq)
+
+# Use a simple method to fill in missing Rating values
+# Create a matrix for Rating with dimensions matching the grid
+rating_matrix <- matrix(NA, nrow = length(price_seq), ncol = length(agegroup_seq))
+
+# Assign existing ratings to the matrix based on Price and AgeGroup
+for (i in 1:nrow(data)) {
+  price_index <- which.min(abs(price_seq - data$Price[i]))
+  agegroup_index <- which.min(abs(agegroup_seq - data$AgeGroupNum[i]))
+  rating_matrix[price_index, agegroup_index] <- data$Rating[i]
+}
+
+# Fill in missing values with the mean of existing ratings
+rating_matrix[is.na(rating_matrix)] <- mean(data$Rating, na.rm = TRUE)
+
+# Create a 3D surface plot
+plot_ly(
+  x = price_seq, 
+  y = agegroup_seq, 
+  z = rating_matrix, 
+  type = "surface"
+) %>%
+  layout(title = "3D Surface Plot of Rating vs Price and Age Group",
+         scene = list(
+           xaxis = list(title = 'Price ($)'),
+           yaxis = list(title = 'Age Group'),
+           zaxis = list(title = 'Rating')
+         ))
