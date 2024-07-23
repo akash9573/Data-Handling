@@ -1,0 +1,57 @@
+library(plotly)
+
+# Create the data frame
+data <- data.frame(
+  Date = as.Date(c('2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05')),
+  Temperature = c(10, 12, 8, 15, 14),
+  Humidity = c(75, 70, 80, 65, 72),
+  WindSpeed = c(15, 12, 18, 20, 16)
+)
+
+# Generate a grid of humidity and wind speed values for separate plots
+humidity_range <- seq(min(data$Humidity), max(data$Humidity), length.out = 10)
+wind_speed_range <- seq(min(data$WindSpeed), max(data$WindSpeed), length.out = 10)
+
+# Create a grid of values for humidity vs temperature
+humidity_grid <- rep(humidity_range, each = length(wind_speed_range))
+wind_speed_grid_humidity <- rep(mean(data$WindSpeed), length(humidity_grid))
+
+# Create a grid of values for wind speed vs temperature
+humidity_grid_wind <- rep(mean(data$Humidity), length(humidity_grid))
+wind_speed_grid <- rep(wind_speed_range, each = length(humidity_range))
+
+# Use a linear model to predict temperature
+model <- lm(Temperature ~ Humidity + WindSpeed, data = data)
+temperature_grid_humidity <- predict(model, newdata = data.frame(Humidity = humidity_grid, WindSpeed = wind_speed_grid_humidity))
+temperature_grid_wind <- predict(model, newdata = data.frame(Humidity = humidity_grid_wind, WindSpeed = wind_speed_grid))
+
+# Reshape the data for plotting
+humidity_matrix <- matrix(humidity_grid, nrow = length(wind_speed_range), ncol = length(humidity_range))
+wind_speed_matrix <- matrix(wind_speed_grid, nrow = length(wind_speed_range), ncol = length(humidity_range))
+temperature_matrix_humidity <- matrix(temperature_grid_humidity, nrow = length(wind_speed_range), ncol = length(humidity_range))
+temperature_matrix_wind <- matrix(temperature_grid_wind, nrow = length(wind_speed_range), ncol = length(humidity_range))
+
+# Create the 3D surface plot for temperature vs humidity
+plot_humidity <- plot_ly(x = ~humidity_matrix, y = ~wind_speed_matrix, z = ~temperature_matrix_humidity, type = "surface") %>%
+  layout(
+    title = "3D Surface Plot: Temperature vs Humidity",
+    scene = list(
+      xaxis = list(title = "Humidity (%)"),
+      yaxis = list(title = "Wind Speed (km/h)"),
+      zaxis = list(title = "Temperature (°C)")
+    )
+  )
+
+# Create the 3D surface plot for temperature vs wind speed
+plot_wind <- plot_ly(x = ~wind_speed_matrix, y = ~humidity_matrix, z = ~temperature_matrix_wind, type = "surface") %>%
+  layout(
+    title = "3D Surface Plot: Temperature vs Wind Speed",
+    scene = list(
+      xaxis = list(title = "Wind Speed (km/h)"),
+      yaxis = list(title = "Humidity (%)"),
+      zaxis = list(title = "Temperature (°C)")
+    )
+  )
+
+# Display the plots
+subplot(plot_humidity, plot_wind, nrows = 1, margin = 0.05)
