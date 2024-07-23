@@ -1,0 +1,27 @@
+# Install and load the necessary package
+install.packages("plotly")
+library(plotly)
+
+# Create a data frame with the given data
+data <- data.frame(
+  Student = c("A", "B", "C", "D", "E"),
+  Math_Score = c(85, 72, 90, 78, 88),
+  Science_Score = c(78, 85, 80, 75, 82),
+  Attendance = c(95, 92, 98, 85, 93)
+)
+
+# Create a grid of Math Scores and Attendance values
+math_range <- seq(min(data$Math_Score), max(data$Math_Score), length.out = 100)
+attendance_range <- seq(min(data$Attendance), max(data$Attendance), length.out = 100)
+grid <- expand.grid(Math_Score = math_range, Attendance = attendance_range)
+
+# Predict Science Scores based on the grid values using linear model
+model <- lm(Science_Score ~ Math_Score + Attendance, data = data)
+grid$Science_Score <- predict(model, newdata = grid)
+
+# Create a 3D surface plot
+plot_ly(grid, x = ~Math_Score, y = ~Attendance, z = ~Science_Score, type = 'surface') %>%
+  layout(scene = list(xaxis = list(title = 'Math Score'),
+                      yaxis = list(title = 'Attendance (%)'),
+                      zaxis = list(title = 'Science Score')),
+         title = '3D Surface Plot of Science Scores')
