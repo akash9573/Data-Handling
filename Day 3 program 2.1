@@ -1,0 +1,53 @@
+# Load necessary library
+library(ggplot2)
+
+# Create the data frame
+data <- data.frame(
+  Date = as.Date(c("2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05")),
+  StockPrice = c(100, 102, 98, 105, 108),
+  VolumeTraded = c(2.5, 3.0, 2.2, 2.8, 3.5),
+  MarketCap = c(500, 510, 490, 525, 540)
+)
+
+# View the data
+print(data)
+
+# Plot Stock Price vs. Market Cap
+ggplot(data, aes(x = StockPrice, y = MarketCap)) +
+  geom_point(color = "blue") +
+  geom_line(aes(group = 1), color = "blue") +
+  ggtitle("Stock Price vs. Market Cap") +
+  xlab("Stock Price ($)") +
+  ylab("Market Cap ($)")
+
+# Plot Stock Price vs. Volume Traded
+ggplot(data, aes(x = StockPrice, y = VolumeTraded)) +
+  geom_point(color = "red") +
+  geom_line(aes(group = 1), color = "red") +
+  ggtitle("Stock Price vs. Volume Traded") +
+  xlab("Stock Price ($)") +
+  ylab("Volume Traded (millions)")
+
+# Plot Volume Traded over time
+ggplot(data, aes(x = Date, y = VolumeTraded)) +
+  geom_point(color = "green") +
+  geom_line(aes(group = 1), color = "green") +
+  ggtitle("Volume Traded Over Time") +
+  xlab("Date") +
+  ylab("Volume Traded (millions)")
+
+# Plot Stock Price over time
+ggplot(data, aes(x = Date, y = StockPrice)) +
+  geom_point(color = "purple") +
+  geom_line(aes(group = 1), color = "purple") +
+  ggtitle("Stock Price Over Time") +
+  xlab("Date") +
+  ylab("Stock Price ($)")
+
+# Plot Market Cap over time
+ggplot(data, aes(x = Date, y = MarketCap)) +
+  geom_point(color = "orange") +
+  geom_line(aes(group = 1), color = "orange") +
+  ggtitle("Market Cap Over Time") +
+  xlab("Date") +
+  ylab("Market Cap ($)")
