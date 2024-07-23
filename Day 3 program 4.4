@@ -1,0 +1,31 @@
+# Install and load the plotly package
+# install.packages("plotly")
+library(plotly)
+
+# Create the data frame
+data <- data.frame(
+  Location = c("A", "B", "C", "D", "E"),
+  Temperature = c(15, 20, 18, 12, 17),
+  Humidity = c(65, 70, 68, 60, 72),
+  CO2 = c(400, 450, 420, 380, 430)
+)
+
+# Create a grid of temperature and humidity values
+temp_seq <- seq(min(data$Temperature), max(data$Temperature), length.out = 50)
+humidity_seq <- seq(min(data$Humidity), max(data$Humidity), length.out = 50)
+grid <- expand.grid(Temperature = temp_seq, Humidity = humidity_seq)
+
+# Fit a linear model to predict CO2 based on temperature and humidity
+lm_model <- lm(CO2 ~ Temperature + Humidity, data = data)
+
+# Predict CO2 levels for the grid of temperature and humidity values
+grid$CO2 <- predict(lm_model, newdata = grid)
+
+# Create the 3D surface plot
+plot_ly(grid, x = ~Temperature, y = ~Humidity, z = ~CO2, type = "surface") %>%
+  layout(title = "3D Surface Plot: CO2 Levels vs. Temperature and Humidity",
+         scene = list(
+           xaxis = list(title = 'Temperature (°C)'),
+           yaxis = list(title = 'Humidity (%)'),
+           zaxis = list(title = 'CO2 Levels (ppm)')
+         ))
