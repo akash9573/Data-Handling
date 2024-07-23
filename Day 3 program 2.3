@@ -1,0 +1,43 @@
+library(plotly)
+library(dbscan)
+
+# Create the data frame
+data <- data.frame(
+  Date = as.Date(c("2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05")),
+  StockPrice = c(100, 102, 98, 105, 108),
+  VolumeTraded = c(2.5, 3.0, 2.2, 2.8, 3.5),
+  MarketCap = c(500, 510, 490, 525, 540)
+)
+
+# K-means clustering (for example, 2 clusters)
+set.seed(123) # For reproducibility
+kmeans_result <- kmeans(data[, c('VolumeTraded', 'MarketCap', 'StockPrice')], centers = 2)
+
+# Add cluster information to the data frame
+data$Cluster <- as.factor(kmeans_result$cluster)
+
+# Create the 3D scatter plot with clusters
+plot_ly(data, x = ~VolumeTraded, y = ~MarketCap, z = ~StockPrice, color = ~Cluster, colors = c('blue', 'red'),
+        type = 'scatter3d', mode = 'markers', 
+        marker = list(size = 5)) %>%
+  layout(title = "3D Scatter Plot with K-means Clustering",
+         scene = list(xaxis = list(title = 'Volume Traded (millions)'),
+                      yaxis = list(title = 'Market Cap ($)'),
+                      zaxis = list(title = 'Stock Price ($)')))
+
+# Outlier detection using DBSCAN
+# Note: eps is the maximum distance between points to be considered as neighbors
+# MinPts is the minimum number of points to form a cluster
+dbscan_result <- dbscan(data[, c('VolumeTraded', 'MarketCap', 'StockPrice')], eps = 1.0, minPts = 2)
+
+# Add outlier information to the data frame
+data$Outlier <- ifelse(dbscan_result$cluster == 0, 'Yes', 'No')
+
+# Create the 3D scatter plot with outliers
+plot_ly(data, x = ~VolumeTraded, y = ~MarketCap, z = ~StockPrice, color = ~Outlier, colors = c('green', 'purple'),
+        type = 'scatter3d', mode = 'markers', 
+        marker = list(size = 5)) %>%
+  layout(title = "3D Scatter Plot with Outlier Detection",
+         scene = list(xaxis = list(title = 'Volume Traded (millions)'),
+                      yaxis = list(title = 'Market Cap ($)'),
+                      zaxis = list(title = 'Stock Price ($)')))
