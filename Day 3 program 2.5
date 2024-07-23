@@ -1,0 +1,29 @@
+# Install and load necessary libraries
+if (!require(plotly)) install.packages("plotly")
+library(plotly)
+
+# Create the data frame
+data <- data.frame(
+  Date = as.Date(c("2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05")),
+  StockPrice = c(100, 102, 98, 105, 108),
+  VolumeTraded = c(2.5, 3.0, 2.2, 2.8, 3.5),
+  MarketCap = c(500, 510, 490, 525, 540)
+)
+
+# 3D Scatter Plot: Stock Price vs. Volume Traded and Market Cap
+plot_ly(data, x = ~VolumeTraded, y = ~MarketCap, z = ~StockPrice, 
+        type = 'scatter3d', mode = 'markers',
+        marker = list(size = 5, color = ~StockPrice, colorscale = 'Viridis', showscale = TRUE)) %>%
+  layout(title = "3D Scatter Plot of Stock Price vs. Volume Traded and Market Cap",
+         scene = list(xaxis = list(title = 'Volume Traded (millions)'),
+                      yaxis = list(title = 'Market Cap ($)'),
+                      zaxis = list(title = 'Stock Price ($)')))
+
+# 3D Scatter Plot: Stock Price vs. Market Cap and Volume Traded
+plot_ly(data, x = ~MarketCap, y = ~VolumeTraded, z = ~StockPrice, 
+        type = 'scatter3d', mode = 'markers',
+        marker = list(size = 5, color = ~StockPrice, colorscale = 'Viridis', showscale = TRUE)) %>%
+  layout(title = "3D Scatter Plot of Stock Price vs. Market Cap and Volume Traded",
+         scene = list(xaxis = list(title = 'Market Cap ($)'),
+                      yaxis = list(title = 'Volume Traded (millions)'),
+                      zaxis = list(title = 'Stock Price ($)')))
