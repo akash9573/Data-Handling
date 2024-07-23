@@ -1,0 +1,33 @@
+# Install and load required libraries
+install.packages("plotly")
+library(plotly)
+
+# Create the data frame
+data <- data.frame(
+  Product = c("A", "B", "C", "D", "E"),
+  Price = c(50, 70, 60, 45, 55),
+  Rating = c(4.2, 3.8, 4.0, 4.5, 3.9),
+  AgeGroup = c("25-35", "35-45", "18-25", "45-55", "25-35")
+)
+
+# Convert AgeGroup to a factor and then to numeric
+data$AgeGroup <- as.factor(data$AgeGroup)
+data$AgeGroupNum <- as.numeric(data$AgeGroup)
+
+# Calculate correlations
+cor_price_rating <- cor(data$Price, data$Rating)
+cor_price_agegroup <- cor(data$Price, data$AgeGroupNum)
+cor_rating_agegroup <- cor(data$Rating, data$AgeGroupNum)
+
+# Display correlations
+cat("Correlation between Price and Rating: ", cor_price_rating, "\n")
+cat("Correlation between Price and Age Group: ", cor_price_agegroup, "\n")
+cat("Correlation between Rating and Age Group: ", cor_rating_agegroup, "\n")
+
+# Create a 3D scatter plot
+plot_ly(data, x = ~Price, y = ~Rating, z = ~AgeGroup, color = ~AgeGroup,
+        type = "scatter3d", mode = "markers", marker = list(size = 10)) %>%
+  layout(title = "3D Scatter Plot of Rating vs Price by Age Group",
+         scene = list(xaxis = list(title = 'Price ($)'),
+                      yaxis = list(title = 'Rating'),
+                      zaxis = list(title = 'Age Group')))
