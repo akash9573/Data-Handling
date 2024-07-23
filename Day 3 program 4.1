@@ -1,0 +1,58 @@
+# Load necessary libraries
+library(ggplot2)
+library(plotly)  # For 3D scatter plot
+
+# Create the data frame
+data <- data.frame(
+  Location = c("A", "B", "C", "D", "E"),
+  Temperature = c(15, 20, 18, 12, 17),
+  Humidity = c(65, 70, 68, 60, 72),
+  CO2 = c(400, 450, 420, 380, 430)
+)
+
+# Scatter Plot: CO2 Levels vs. Temperature
+ggplot(data, aes(x = Temperature, y = CO2)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue") +
+  labs(title = "CO2 Levels vs. Temperature",
+       x = "Temperature (°C)",
+       y = "CO2 Levels (ppm)") +
+  theme_minimal()
+
+# Scatter Plot: CO2 Levels vs. Humidity
+ggplot(data, aes(x = Humidity, y = CO2)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue") +
+  labs(title = "CO2 Levels vs. Humidity",
+       x = "Humidity (%)",
+       y = "CO2 Levels (ppm)") +
+  theme_minimal()
+
+# Calculate correlation coefficients
+cor_temp_co2 <- cor(data$Temperature, data$CO2)
+cor_humidity_co2 <- cor(data$Humidity, data$CO2)
+
+cat("Correlation between Temperature and CO2 Levels:", cor_temp_co2, "\n")
+cat("Correlation between Humidity and CO2 Levels:", cor_humidity_co2, "\n")
+
+# Simple Linear Regression: CO2 ~ Temperature
+lm_temp <- lm(CO2 ~ Temperature, data = data)
+cat("Summary of Linear Regression: CO2 ~ Temperature\n")
+print(summary(lm_temp))
+
+# Simple Linear Regression: CO2 ~ Humidity
+lm_humidity <- lm(CO2 ~ Humidity, data = data)
+cat("Summary of Linear Regression: CO2 ~ Humidity\n")
+print(summary(lm_humidity))
+
+# Multiple Linear Regression: CO2 ~ Temperature + Humidity
+lm_multi <- lm(CO2 ~ Temperature + Humidity, data = data)
+cat("Summary of Multiple Linear Regression: CO2 ~ Temperature + Humidity\n")
+print(summary(lm_multi))
+
+# 3D Scatter Plot (Optional)
+plot_ly(data, x = ~Temperature, y = ~Humidity, z = ~CO2, type = "scatter3d", mode = "markers") %>%
+  layout(title = "3D Scatter Plot: CO2 Levels vs. Temperature and Humidity",
+         scene = list(xaxis = list(title = 'Temperature (°C)'),
+                      yaxis = list(title = 'Humidity (%)'),
+                      zaxis = list(title = 'CO2 Levels (ppm)')))
