@@ -1,0 +1,185 @@
+# Load Required Libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+
+# Load the Data
+data <- read.table(header=TRUE, text="
+Store_ID Region Month Total_Sales Number_Of_Customers Average_Transaction_Value
+1 North January 10000 500 20
+2 South January 15000 700 21.43
+3 East January 12000 600 20
+4 West January 13000 650 20
+5 North February 9000 450 20
+6 South February 16000 800 20
+7 East February 14000 700 20
+8 West February 11000 550 20
+9 North March 11000 550 20
+10 South March 17000 850 20
+11 East March 13000 650 20
+12 West March 15000 750 20
+13 North April 12000 600 20
+14 South April 18000 900 20
+15 East April 16000 800 20
+16 West April 14000 700 20
+17 North May 13000 650 20
+18 South May 19000 950 20
+19 East May 15000 750 20
+20 West May 16000 800 20
+21 North June 14000 700 20
+22 South June 20000 1000 20
+23 East June 17000 850 20
+24 West June 15000 750 20
+25 North July 15000 750 20
+26 South July 21000 1050 20
+27 East July 16000 800 20
+28 West July 14000 700 20
+29 North August 16000 800 20
+30 South August 22000 1100 20
+31 East August 13000 650 20
+32 West August 15000 750 20
+33 North September 12000 600 20
+34 South September 18000 900 20
+35 East September 16000 800 20
+36 West September 14000 700 20
+37 North October 13000 650 20
+38 South October 19000 950 20
+39 East October 15000 750 20
+40 West October 16000 800 20
+41 North November 14000 700 20
+42 South November 20000 1000 20
+43 East November 17000 850 20
+44 West November 15000 750 20
+45 North December 15000 750 20
+46 South December 21000 1050 20
+47 East December 16000 800 20
+48 West December 14000 700 20
+")
+
+# Convert Month to factor with correct order
+data$Month <- factor(data$Month, levels=month.name)
+
+# Create a Date column for trend analysis
+data$Date <- as.Date(paste(data$Month, "1", sep="-"), format="%B-%d")
+
+# Summarize Data
+data_summary <- data %>%
+  group_by(Region, Month) %>%
+  summarise(
+    Total_Sales = sum(Total_Sales),
+    Total_Customers = sum(Number_Of_Customers),
+    Avg_Transaction_Value = mean(Average_Transaction_Value)
+  )
+
+# Initialize Plot List
+plot_list <- list()
+
+# Generate Plots
+plot_list[[1]] <- ggplot(data_summary, aes(x=Region, y=Total_Sales, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Total Sales by Region", x="Region", y="Total Sales")
+
+plot_list[[2]] <- ggplot(data_summary, aes(x=Month, y=Total_Sales, fill=Month)) +
+  geom_bar(stat="identity") +
+  labs(title="Total Sales by Month", x="Month", y="Total Sales")
+
+plot_list[[3]] <- ggplot(data_summary, aes(x=Region, y=Total_Customers, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Number of Customers by Region", x="Region", y="Number of Customers")
+
+plot_list[[4]] <- ggplot(data_summary, aes(x=Month, y=Total_Customers, fill=Month)) +
+  geom_bar(stat="identity") +
+  labs(title="Number of Customers by Month", x="Month", y="Number of Customers")
+
+plot_list[[5]] <- ggplot(data_summary, aes(x=Region, y=Avg_Transaction_Value, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Average Transaction Value by Region", x="Region", y="Average Transaction Value")
+
+plot_list[[6]] <- ggplot(data_summary, aes(x=Month, y=Avg_Transaction_Value, fill=Month)) +
+  geom_bar(stat="identity") +
+  labs(title="Average Transaction Value by Month", x="Month", y="Average Transaction Value")
+
+plot_list[[7]] <- ggplot(data, aes(x=Date, y=Total_Sales)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE) +
+  labs(title="Sales Trendline", x="Date", y="Total Sales")
+
+plot_list[[8]] <- ggplot(data, aes(x=Month, y=Total_Sales, color=Region, group=Region)) +
+  geom_line() +
+  labs(title="Seasonal Sales by Region", x="Month", y="Total Sales")
+
+plot_list[[9]] <- ggplot(data, aes(x=Number_Of_Customers, y=Total_Sales, color=Region)) +
+  geom_point() +
+  labs(title="Sales vs Number of Customers", x="Number of Customers", y="Total Sales")
+
+plot_list[[10]] <- ggplot(data, aes(x=factor(Store_ID), y=Total_Sales, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Total Sales by Store ID", x="Store ID", y="Total Sales")
+
+plot_list[[11]] <- ggplot(data, aes(x=factor(Store_ID), y=Number_Of_Customers, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Number of Customers by Store ID", x="Store ID", y="Number of Customers")
+
+plot_list[[12]] <- ggplot(data, aes(x=factor(Store_ID), y=Average_Transaction_Value, fill=Region)) +
+  geom_bar(stat="identity") +
+  labs(title="Average Transaction Value by Store ID", x="Store ID", y="Average Transaction Value")
+
+plot_list[[13]] <- ggplot(data %>% mutate(Year = year(Date)), aes(x=factor(Year), y=Total_Sales, fill=factor(Year))) +
+  geom_bar(stat="identity") +
+  labs(title="Total Sales by Year", x="Year", y="Total Sales")
+
+plot_list[[14]] <- ggplot(data %>% mutate(Year = year(Date)), aes(x=factor(Year), y=Total_Customers, fill=factor(Year))) +
+  geom_bar(stat="identity") +
+  labs(title="Number of Customers by Year", x="Year", y="Number of Customers")
+
+plot_list[[15]] <- ggplot(data %>% mutate(Year = year(Date)), aes(x=factor(Year), y=Average_Transaction_Value, fill=factor(Year))) +
+  geom_bar(stat="identity") +
+  labs(title="Average Transaction Value by Year", x="Year", y="Average Transaction Value")
+
+plot_list[[16]] <- ggplot(data %>% filter(Region == "North"), aes(x=Month, y=Total_Sales)) +
+  geom_line() +
+  labs(title="Monthly Sales for North Region", x="Month", y="Total Sales")
+
+plot_list[[17]] <- ggplot(data %>% filter(Region == "South"), aes(x=Month, y=Total_Sales)) +
+  geom_line() +
+  labs(title="Monthly Sales for South Region", x="Month", y="Total Sales")
+
+plot_list[[18]] <- ggplot(data %>% filter(Region == "East"), aes(x=Month, y=Total_Sales)) +
+  geom_line() +
+  labs(title="Monthly Sales for East Region", x="Month", y="Total Sales")
+
+plot_list[[19]] <- ggplot(data %>% filter(Region == "West"), aes(x=Month, y=Total_Sales)) +
+  geom_line() +
+  labs(title="Monthly Sales for West Region", x="Month", y="Total Sales")
+
+plot_list[[20]] <- ggplot(data, aes(x=Total_Sales, fill=Region)) +
+  geom_histogram(binwidth=1000, position="dodge") +
+  labs(title="Total Sales Distribution by Region", x="Total Sales", y="Frequency")
+
+plot_list[[21]] <- ggplot(data, aes(x=Number_Of_Customers, fill=Region)) +
+  geom_histogram(binwidth=50, position="dodge") +
+  labs(title="Number of Customers Distribution by Region", x="Number of Customers", y="Frequency")
+
+plot_list[[22]] <- ggplot(data, aes(x=Average_Transaction_Value, fill=Region)) +
+  geom_histogram(binwidth=0.5, position="dodge") +
+  labs(title="Average Transaction Value Distribution by Region", x="Average Transaction Value", y="Frequency")
+
+plot_list[[23]] <- ggplot(data_summary, aes(x=Month, y=Total_Sales, color=Region)) +
+  geom_line() +
+  labs(title="Total Sales by Month and Region", x="Month", y="Total Sales")
+
+plot_list[[24]] <- ggplot(data_summary, aes(x=Month, y=Total_Customers, color=Region)) +
+  geom_line() +
+  labs(title="Number of Customers by Month and Region", x="Month", y="Total Customers")
+
+plot_list[[25]] <- ggplot(data, aes(x=Month)) +
+  geom_line(aes(y=Total_Sales, color="Total Sales")) +
+  geom_line(aes(y=Average_Transaction_Value*1000, color="Average Transaction Value")) +
+  labs(title="Sales and Average Transaction Value by Month", x="Month", y="Value") +
+  scale_y_continuous(sec.axis = sec_axis(~./1000, name = "Average Transaction Value"))
+
+# Output the plots
+for (i in 1:length(plot_list)) {
+  print(plot_list[[i]])
+}
