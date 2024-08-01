@@ -1,0 +1,167 @@
+# Install and Load Required Libraries
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(tidyr)) install.packages("tidyr")
+if(!require(scatterplot3d)) install.packages("scatterplot3d")
+if(!require(plotly)) install.packages("plotly")
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(scatterplot3d)
+library(plotly)
+
+# Load Data
+data <- read.table(header=TRUE, text="
+Customer_ID Age Gender Purchase_Amount Membership_Level
+1 35 Male 100 Gold
+2 28 Female 80 Silver
+3 42 Male 120 Bronze
+4 25 Female 90 Bronze
+5 38 Male 110 Silver
+6 45 Female 150 Gold
+7 23 Male 60 Silver
+8 34 Female 130 Gold
+9 40 Male 95 Bronze
+10 30 Female 85 Silver
+11 29 Male 70 Bronze
+12 50 Female 160 Gold
+13 32 Male 75 Silver
+14 47 Female 140 Bronze
+15 36 Male 115 Gold
+16 27 Female 65 Silver
+17 41 Male 125 Bronze
+18 33 Female 135 Gold
+19 39 Male 105 Silver
+20 26 Female 95 Bronze
+21 48 Male 145 Gold
+22 31 Female 90 Silver
+23 44 Male 120 Bronze
+24 37 Female 125 Gold
+25 43 Male 130 Silver
+26 24 Female 85 Bronze
+27 46 Male 155 Gold
+28 49 Female 140 Silver
+29 21 Male 50 Bronze
+30 22 Female 60 Silver
+")
+
+# Data Cleaning
+data <- data %>%
+  mutate(Gender = as.factor(Gender),
+         Membership_Level = as.factor(Membership_Level))
+
+# Data Processing
+data_summary <- data %>%
+  group_by(Age, Gender, Membership_Level) %>%
+  summarise(
+    Total_Purchase_Amount = sum(Purchase_Amount),
+    Avg_Purchase_Amount = mean(Purchase_Amount)
+  )
+
+# EDA Analysis
+summary(data)
+
+# Initialize Plot List
+plot_list <- list()
+
+# 3D Visualizations using plotly
+plot_list[[1]] <- plot_ly(data, x = ~Age, y = ~as.numeric(Gender), z = ~Purchase_Amount,
+                          type = 'scatter3d', mode = 'markers', color = ~Gender,
+                          colors = c('#1f77b4', '#ff7f0e')) %>%
+  layout(scene = list(xaxis = list(title = 'Age'),
+                      yaxis = list(title = 'Gender'),
+                      zaxis = list(title = 'Purchase Amount')),
+         title = "3D Scatter Plot of Age, Gender and Purchase Amount")
+
+plot_list[[2]] <- plot_ly(data, x = ~Age, y = ~as.numeric(Membership_Level), z = ~Purchase_Amount,
+                          type = 'scatter3d', mode = 'markers', color = ~Membership_Level,
+                          colors = c('#1f77b4', '#ff7f0e', '#2ca02c')) %>%
+  layout(scene = list(xaxis = list(title = 'Age'),
+                      yaxis = list(title = 'Membership Level'),
+                      zaxis = list(title = 'Purchase Amount')),
+         title = "3D Plot by Membership Level")
+
+# 2D Visualizations
+plot_list[[3]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Gender)) +
+  geom_point() +
+  labs(title="Age vs Purchase Amount", x="Age", y="Purchase Amount")
+
+plot_list[[4]] <- ggplot(data, aes(x=Age, fill=Gender)) +
+  geom_histogram(binwidth=5, position="dodge") +
+  labs(title="Age Distribution by Gender", x="Age", y="Count")
+
+plot_list[[5]] <- ggplot(data, aes(x=Gender, y=Purchase_Amount, fill=Gender)) +
+  geom_boxplot() +
+  labs(title="Purchase Amount by Gender", x="Gender", y="Purchase Amount")
+
+plot_list[[6]] <- ggplot(data, aes(x=Membership_Level, y=Purchase_Amount, fill=Membership_Level)) +
+  geom_boxplot() +
+  labs(title="Purchase Amount by Membership Level", x="Membership Level", y="Purchase Amount")
+
+plot_list[[7]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Gender)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  labs(title="Age vs Purchase Amount by Gender", x="Age", y="Purchase Amount")
+
+plot_list[[8]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Membership_Level)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  labs(title="Age vs Purchase Amount by Membership Level", x="Age", y="Purchase Amount")
+
+plot_list[[9]] <- ggplot(data, aes(x=Purchase_Amount, fill=Membership_Level)) +
+  geom_histogram(binwidth=10, position="dodge") +
+  labs(title="Purchase Amount Distribution", x="Purchase Amount", y="Count")
+
+plot_list[[10]] <- data_summary %>%
+  ggplot(aes(x=Age, y=Avg_Purchase_Amount, fill=Membership_Level)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Average Purchase Amount by Age", x="Age", y="Average Purchase Amount")
+
+plot_list[[11]] <- data_summary %>%
+  ggplot(aes(x=Age, y=Total_Purchase_Amount, fill=Membership_Level)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Total Purchase Amount by Age", x="Age", y="Total Purchase Amount")
+
+plot_list[[12]] <- ggplot(data, aes(x=Gender, fill=Gender)) +
+  geom_bar() +
+  labs(title="Gender Distribution", x="Gender", y="Count")
+
+plot_list[[13]] <- ggplot(data, aes(x=Membership_Level, fill=Membership_Level)) +
+  geom_bar() +
+  labs(title="Membership Level Distribution", x="Membership Level", y="Count")
+
+plot_list[[14]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Gender)) +
+  geom_point() +
+  facet_wrap(~ Membership_Level) +
+  labs(title="Age vs Purchase Amount by Gender and Membership Level", x="Age", y="Purchase Amount")
+
+plot_list[[15]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Membership_Level)) +
+  geom_point() +
+  facet_wrap(~ Gender) +
+  labs(title="Age vs Purchase Amount by Membership Level and Gender", x="Age", y="Purchase Amount")
+
+plot_list[[16]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Gender)) +
+  geom_point() +
+  labs(title="Correlation between Age and Purchase Amount", x="Age", y="Purchase Amount")
+
+plot_list[[17]] <- ggplot(data, aes(x=Age, y=Purchase_Amount, color=Membership_Level)) +
+  geom_point() +
+  labs(title="Correlation between Age and Purchase Amount by Membership Level", x="Age", y="Purchase Amount")
+
+plot_list[[18]] <- ggplot(data_summary, aes(x=Gender, y=Avg_Purchase_Amount, fill=Gender)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Average Purchase Amount by Gender", x="Gender", y="Average Purchase Amount")
+
+plot_list[[19]] <- ggplot(data_summary, aes(x=Membership_Level, y=Avg_Purchase_Amount, fill=Membership_Level)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Average Purchase Amount by Membership Level", x="Membership Level", y="Average Purchase Amount")
+
+plot_list[[20]] <- ggplot(data_summary, aes(x=Age, y=Avg_Purchase_Amount, color=Membership_Level)) +
+  geom_line() +
+  labs(title="Trend of Average Purchase Amount by Age", x="Age", y="Average Purchase Amount")
+
+# Output the plots
+for (i in 1:length(plot_list)) {
+  print(plot_list[[i]])
+}
